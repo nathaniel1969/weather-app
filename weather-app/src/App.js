@@ -10,15 +10,23 @@ function App() {
   const [weatherData, setWeatherData] = useState(null);
   const [currentWeatherData, setCurrentWeatherData] = useState(null);
   const [location, setLocation] = useState("New York");
+  const [timezoneOffset, setTimezoneOffset] = useState(0); // New state for timezone offset
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await getWeatherData(location);
         setWeatherData(data);
+        // Extract timezone offset from the API response
+        if (data && data.location && data.location.tz_offset) {
+          setTimezoneOffset(data.location.tz_offset);
+        } else {
+          setTimezoneOffset(0); // Default to 0 if not available
+        }
       } catch (error) {
         console.error("Error in App.js:", error);
         setWeatherData(null);
+        setTimezoneOffset(0); // Reset on error
       }
     };
     fetchData();
@@ -47,7 +55,12 @@ function App() {
       <SearchBar onSearch={handleSearch} />
       {currentWeatherData && <CurrentWeather data={currentWeatherData} />}
       {weatherData && <DailyForecast forecast={weatherData.forecast} />}
-      {weatherData && <HourlyForecast forecast={weatherData.forecast} />}
+      {weatherData && (
+        <HourlyForecast
+          forecast={weatherData.forecast}
+          timezoneOffset={timezoneOffset} // Pass the timezone offset to HourlyForecast
+        />
+      )}
     </div>
   );
 }

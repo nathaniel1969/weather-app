@@ -14,11 +14,11 @@
   "author": "Nathaniel Robinson",
   "main": "index.js",
   "dependencies": {
-    "axios": "^1.8.4",
-    "bootstrap": "^5.3.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1"
+    "axios": "latest",
+    "bootstrap": "latest",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-scripts": "^5.0.1"
   },
   "scripts": {
     "predeploy": "npm run clean-cache && npm run build",
@@ -50,6 +50,6 @@
   "devDependencies": {
     "cross-env": "^7.0.3",
     "gh-pages": "^6.3.0",
-    "rimraf": "^5.0.10"
+    "rimraf": "^6.0.1"
   }
 }

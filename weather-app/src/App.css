@@ -1,1 +1,5 @@
-/* Add any custom styles here */
+/* In App.css or your custom CSS file */
+.weather-icon {
+  width: 50px; /* Adjust the size as needed */
+  height: 50px;
+}
