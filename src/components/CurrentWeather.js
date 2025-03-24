@@ -4,19 +4,26 @@ const CurrentWeather = ({ data }) => {
   if (!data) return null;
 
   const { current, location } = data;
-  const date = new Date(current.last_updated);
+
+  // Use the location's localtime to create a Date object
+  const date = new Date(location.localtime);
 
   const formattedDate = date.toLocaleDateString("en-US", {
     month: "short",
     day: "2-digit",
     year: "numeric",
+    timeZone: location.tz_id, // Use the location's time zone
   });
 
-  const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "long" });
+  const dayOfWeek = date.toLocaleDateString("en-US", {
+    weekday: "long",
+    timeZone: location.tz_id, // Use the location's time zone
+  });
   const formattedTime = date.toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "numeric",
     hour12: true,
+    timeZone: location.tz_id, // Use the location's time zone
   });
 
   return (

@@ -15,15 +15,14 @@ const DailyForecast = ({ forecast, data }) => {
     return null;
   }
 
-  // Extract the date portion from the local time string
-  const localDateStr = data.location.localtime.split(" ")[0]; // e.g., "2024-03-25"
-  const today = new Date(localDateStr); // Create a Date object from the date string
+  // Get the current date and time from the API response
+  const now = new Date(data.location.localtime);
 
   // Filter out today and previous days, then take the next 7 days
   const nextSevenDays = forecast.forecastday
     .filter((day) => {
       const dayDate = new Date(day.date);
-      return dayDate > today;
+      return dayDate > now;
     })
     .slice(0, 7);
 
@@ -31,11 +30,14 @@ const DailyForecast = ({ forecast, data }) => {
 
   return (
     <div className="row">
-      {nextSevenDays.map((day, index) => (
-        <div key={index} className="col-md-4 col-lg-3">
-          <ForecastCard day={day} />
-        </div>
-      ))}
+      {nextSevenDays.map((day, index) => {
+        console.log("Day being passed to ForecastCard:", day);
+        return (
+          <div key={index} className="col-md-4 col-lg-3">
+            <ForecastCard day={day} locationTimezone={data.location.tz_id} />
+          </div>
+        );
+      })}
     </div>
   );
 };
