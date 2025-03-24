@@ -9,7 +9,7 @@ export const getWeatherData = async (location) => {
       params: {
         key: API_KEY,
         q: location,
-        days: 8, // Current day + 7 days forecast
+        days: 10, // Current day + 7 days forecast
         aqi: "no",
         alerts: "no",
       },

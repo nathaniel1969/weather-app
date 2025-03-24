@@ -16,10 +16,9 @@ function App() {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
-      // In App.js, inside the fetchData function:
       try {
         const data = await getWeatherData(location);
-        console.log("API Response:", data); // Add this line
+        console.log("API Response (App.js):", data); // Check API response
         setWeatherData(data);
       } catch (error) {
         console.error("Error in App.js:", error);
@@ -31,6 +30,8 @@ function App() {
     };
     fetchData();
   }, [location]);
+
+  console.log("weatherData (App.js):", weatherData); // Check weatherData state
 
   const handleSearch = (newLocation) => {
     setLocation(newLocation);
@@ -44,7 +45,7 @@ function App() {
       {error && <div className="text-center text-danger">{error}</div>}
       {!isLoading && weatherData && <CurrentWeather data={weatherData} />}
       {!isLoading && weatherData && (
-        <DailyForecast forecast={weatherData.forecast} />
+        <DailyForecast forecast={weatherData.forecast} data={weatherData} />
       )}
       {!isLoading && weatherData && (
         <HourlyForecast forecast={weatherData.forecast} data={weatherData} /> // Pass the entire weatherData
