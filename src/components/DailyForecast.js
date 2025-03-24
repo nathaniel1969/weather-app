@@ -4,6 +4,7 @@ import ForecastCard from "./ForecastCard";
 const DailyForecast = ({ forecast }) => {
   if (!forecast || !forecast.forecastday) return null;
 
+  // Start from the second day (index 1) to skip the current day
   return (
     <div className="row">
       {forecast.forecastday.slice(1).map((day, index) => (
