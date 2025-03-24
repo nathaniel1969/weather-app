@@ -20,19 +20,3 @@ export const getWeatherData = async (location) => {
     throw error;
   }
 };
-
-export const getCurrentWeatherData = async (location) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/current.json`, {
-      params: {
-        key: API_KEY,
-        q: location,
-        aqi: "no",
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching current weather data:", error);
-    throw error;
-  }
-};

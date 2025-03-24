@@ -3,46 +3,33 @@ import SearchBar from "./components/SearchBar";
 import CurrentWeather from "./components/CurrentWeather";
 import DailyForecast from "./components/DailyForecast";
 import HourlyForecast from "./components/HourlyForecast";
-import { getWeatherData, getCurrentWeatherData } from "./api";
+import { getWeatherData } from "./api";
 import "./App.css";
 
 function App() {
   const [weatherData, setWeatherData] = useState(null);
-  const [currentWeatherData, setCurrentWeatherData] = useState(null);
   const [location, setLocation] = useState("New York");
-  const [timezoneOffset, setTimezoneOffset] = useState(0); // New state for timezone offset
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      // In App.js, inside the fetchData function:
       try {
         const data = await getWeatherData(location);
+        console.log("API Response:", data); // Add this line
         setWeatherData(data);
-        // Extract timezone offset from the API response
-        if (data && data.location && data.location.tz_offset) {
-          setTimezoneOffset(data.location.tz_offset);
-        } else {
-          setTimezoneOffset(0); // Default to 0 if not available
-        }
       } catch (error) {
         console.error("Error in App.js:", error);
+        setError("Failed to load weather data.");
         setWeatherData(null);
-        setTimezoneOffset(0); // Reset on error
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchData();
-  }, [location]);
-
-  useEffect(() => {
-    const fetchCurrentData = async () => {
-      try {
-        const data = await getCurrentWeatherData(location);
-        setCurrentWeatherData(data);
-      } catch (error) {
-        console.error("Error in App.js:", error);
-        setCurrentWeatherData(null);
-      }
-    };
-    fetchCurrentData();
   }, [location]);
 
   const handleSearch = (newLocation) => {
@@ -53,13 +40,14 @@ function App() {
     <div className="container mt-5">
       <h1 className="text-center mb-4">Weather App</h1>
       <SearchBar onSearch={handleSearch} />
-      {currentWeatherData && <CurrentWeather data={currentWeatherData} />}
-      {weatherData && <DailyForecast forecast={weatherData.forecast} />}
-      {weatherData && (
-        <HourlyForecast
-          forecast={weatherData.forecast}
-          timezoneOffset={timezoneOffset} // Pass the timezone offset to HourlyForecast
-        />
+      {isLoading && <div className="text-center">Loading...</div>}
+      {error && <div className="text-center text-danger">{error}</div>}
+      {!isLoading && weatherData && <CurrentWeather data={weatherData} />}
+      {!isLoading && weatherData && (
+        <DailyForecast forecast={weatherData.forecast} />
+      )}
+      {!isLoading && weatherData && (
+        <HourlyForecast forecast={weatherData.forecast} data={weatherData} /> // Pass the entire weatherData
       )}
     </div>
   );

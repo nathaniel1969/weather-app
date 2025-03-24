@@ -1,54 +1,55 @@
-// In HourlyForecast.js (or wherever your HourlyForecast component is)
 import React from "react";
 
-function HourlyForecast({ forecast, timezoneOffset }) {
-  if (!forecast || !forecast.forecastday || forecast.forecastday.length === 0) {
+function HourlyForecast({ forecast, data }) {
+  console.log("Forecast in HourlyForecast:", forecast);
+  console.log("Data in HourlyForecast:", data);
+  if (
+    !forecast ||
+    !forecast.forecastday ||
+    forecast.forecastday.length === 0 ||
+    !data ||
+    !data.location || // Add this check
+    !data.location.localtime
+  ) {
     return <div>No hourly forecast available.</div>;
   }
 
-  // Get the current time in the target location
-  const now = new Date();
-  const nowUtc = new Date(now.getTime() + now.getTimezoneOffset() * 60000); // Convert to UTC
-  const nowTarget = new Date(nowUtc.getTime() + timezoneOffset * 60000); // Adjust to target timezone
-  const currentHour = nowTarget.getHours();
+  // Get the current time from the API response
+  const localTimeStr = data.location.localtime;
+  const localTime = new Date(localTimeStr);
+  const currentHour = localTime.getHours();
+  const currentDay = localTime.getDate();
 
-  // Filter and adjust the forecast data
+  // Function to adjust and format hour data
+  const adjustHourData = (hourData) => {
+    const hourTime = new Date(hourData.time);
+    const adjustedHour = hourTime.getHours();
+    const formattedHour = adjustedHour % 12 || 12; // Convert to 12-hour format
+    const ampm = adjustedHour < 12 ? "AM" : "PM";
+    const adjustedDay = hourTime.getDate();
+
+    return {
+      ...hourData,
+      adjustedTime: `${formattedHour} ${ampm}`,
+      adjustedHour: adjustedHour,
+      adjustedDay: adjustedDay,
+    };
+  };
+
+  // Process the current day's forecast
   let adjustedForecast = forecast.forecastday[0].hour
-    .map((hourData) => {
-      const utcTime = new Date(hourData.time_epoch * 1000); // Convert epoch to milliseconds
-      const offsetMilliseconds = timezoneOffset * 60 * 1000; // Convert offset to milliseconds
-      const adjustedTime = new Date(utcTime.getTime() + offsetMilliseconds);
-
-      const adjustedHour = adjustedTime.getHours();
-      const formattedHour = adjustedHour % 12 || 12; // Convert to 12-hour format
-      const ampm = adjustedHour < 12 ? "AM" : "PM";
-
-      return {
-        ...hourData,
-        adjustedTime: `${formattedHour} ${ampm}`,
-        adjustedHour: adjustedHour, // Add adjustedHour for filtering
-      };
-    })
-    .filter((hour) => hour.adjustedHour >= currentHour); // Filter out past hours
+    .map(adjustHourData)
+    .filter((hour) => {
+      return (
+        hour.adjustedDay === currentDay && hour.adjustedHour >= currentHour
+      );
+    });
 
   // If there are less than 12 hours left in the day, get the rest from the next day
   if (adjustedForecast.length < 12 && forecast.forecastday.length > 1) {
     const nextDayForecast = forecast.forecastday[1].hour
-      .map((hourData) => {
-        const utcTime = new Date(hourData.time_epoch * 1000); // Convert epoch to milliseconds
-        const offsetMilliseconds = timezoneOffset * 60 * 1000; // Convert offset to milliseconds
-        const adjustedTime = new Date(utcTime.getTime() + offsetMilliseconds);
-
-        const adjustedHour = adjustedTime.getHours();
-        const formattedHour = adjustedHour % 12 || 12; // Convert to 12-hour format
-        const ampm = adjustedHour < 12 ? "AM" : "PM";
-
-        return {
-          ...hourData,
-          adjustedTime: `${formattedHour} ${ampm}`,
-          adjustedHour: adjustedHour, // Add adjustedHour for filtering
-        };
-      })
+      .map(adjustHourData)
+      .filter((hour) => hour.adjustedDay !== currentDay)
       .slice(0, 12 - adjustedForecast.length);
     adjustedForecast.push(...nextDayForecast);
   }

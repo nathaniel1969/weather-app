@@ -44,7 +44,6 @@ const CurrentWeather = ({ data }) => {
           Wind: {current.wind_mph} mph {current.wind_dir}
         </p>
         <p className="card-text">Humidity: {current.humidity}%</p>
-        {/* Removed sunrise and sunset times */}
       </div>
     </div>
   );
