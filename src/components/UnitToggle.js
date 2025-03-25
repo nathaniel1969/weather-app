@@ -14,7 +14,7 @@ const UnitToggle = () => {
         onChange={toggleUnit}
       />
       <label className="form-check-label" htmlFor="unitToggle">
-        {unit === "imperial" ? "°F" : "°C"}
+        {unit === "imperial" ? "Imperial" : "Metric"}
       </label>
     </div>
   );

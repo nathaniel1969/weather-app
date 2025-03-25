@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { useUnit } from "../context/UnitContext";
 
 function HourlyForecast({ forecast, data }) {
+  // Call Hooks FIRST, before any conditional returns
+  const { unit } = useUnit();
+  const [hoursToShow, setHoursToShow] = useState(12); // Default to 12 hours
+
   console.log("Forecast in HourlyForecast:", forecast);
   console.log("Data in HourlyForecast:", data);
+
+  // Now, the conditional return
   if (
     !forecast ||
     !forecast.forecastday ||
@@ -15,8 +21,7 @@ function HourlyForecast({ forecast, data }) {
     return <div>No hourly forecast available.</div>;
   }
 
-  const { unit } = useUnit();
-
+  // ... (rest of your code)
   // Get the current time from the API response
   const localTimeStr = data.location.localtime;
 
@@ -70,20 +75,37 @@ function HourlyForecast({ forecast, data }) {
     });
 
   // If there are less than 12 hours left in the day, get the rest from the next day
-  if (adjustedForecast.length < 12 && forecast.forecastday.length > 1) {
+  if (
+    adjustedForecast.length < hoursToShow &&
+    forecast.forecastday.length > 1
+  ) {
     const nextDayForecast = forecast.forecastday[1].hour
       .map(adjustHourData)
       .filter((hour) => hour.adjustedDay !== currentDay)
-      .slice(0, 12 - adjustedForecast.length);
+      .slice(0, hoursToShow - adjustedForecast.length);
     adjustedForecast.push(...nextDayForecast);
   }
-  adjustedForecast = adjustedForecast.slice(0, 12);
+  adjustedForecast = adjustedForecast.slice(0, hoursToShow);
 
   const tempUnit = unit === "imperial" ? "°F" : "°C";
   return (
     <div className="hourly-forecast">
       <h2 className="text-center mb-3">Hourly Forecast</h2>
-      <div className="row row-cols-1 row-cols-md-3 row-cols-lg-6 g-4">
+      <div className="mb-3">
+        <label htmlFor="hoursToShow" className="me-2">
+          Show Hours:
+        </label>
+        <select
+          id="hoursToShow"
+          value={hoursToShow}
+          onChange={(e) => setHoursToShow(parseInt(e.target.value))}
+        >
+          <option value={12}>12</option>
+          <option value={24}>24</option>
+          <option value={48}>48</option>
+        </select>
+      </div>
+      <div className="hourly-cards-container">
         {adjustedForecast.map((hour) => (
           <div key={hour.time_epoch} className="col">
             <div className="card h-100 text-center">
@@ -92,13 +114,21 @@ function HourlyForecast({ forecast, data }) {
                 <img
                   src={hour.condition.icon}
                   alt={hour.condition.text}
-                  className="weather-icon"
+                  className="weather-icon mb-2"
                 />
                 <p className="card-text">
                   {unit === "imperial" ? hour.temp_f : hour.temp_c}
                   {tempUnit}
                 </p>
                 <p className="card-text">{hour.condition.text}</p>
+                <p className="card-text">
+                  Pressure:{" "}
+                  {unit === "imperial"
+                    ? hour.pressure_in + " inHg"
+                    : hour.pressure_mb + " mb"}
+                </p>
+                <p className="card-text">UV Index: {hour.uv}</p>
+                <p className="card-text">Humidity: {hour.humidity}%</p>
               </div>
             </div>
           </div>
