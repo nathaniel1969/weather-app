@@ -5,19 +5,22 @@ const ForecastCard = ({ day, locationTimezone }) => {
     return null;
   }
 
-  // Create a Date object using the location's time zone
-  const date = new Date(day.date + "T00:00:00");
+  // Extract year, month, and day from day.date
+  const [year, month, dayOfMonth] = day.date.split("-").map(Number);
 
+  // Create a Date object using the extracted components
+  const date = new Date(year, month - 1, dayOfMonth);
+
+  // Format the day of the week
   const dayOfWeek = date.toLocaleDateString("en-US", {
     weekday: "long",
-    timeZone: locationTimezone, // Use the location's time zone
   });
 
+  // Format the date
   const formattedDate = date.toLocaleDateString("en-US", {
     month: "short",
     day: "2-digit",
     year: "numeric",
-    timeZone: locationTimezone, // Use the location's time zone
   });
 
   // Extract sunrise and sunset times
@@ -25,23 +28,41 @@ const ForecastCard = ({ day, locationTimezone }) => {
   let sunsetTime = "";
 
   if (day.astro && day.astro.sunrise && day.astro.sunset) {
-    sunriseTime = new Date(
-      day.date + " " + day.astro.sunrise
-    ).toLocaleTimeString("en-US", {
+    // Extract hours and minutes from sunrise
+    const [sunriseHours, sunriseMinutes] = day.astro.sunrise
+      .split(/[:\s]/)
+      .map(Number);
+    // Create a Date object for sunrise
+    const sunriseDate = new Date(
+      year,
+      month - 1,
+      dayOfMonth,
+      sunriseHours,
+      sunriseMinutes
+    );
+    sunriseTime = sunriseDate.toLocaleTimeString("en-US", {
       hour: "numeric",
       minute: "numeric",
       hour12: true,
-      timeZone: locationTimezone, // Use the location's time zone
     });
-    sunsetTime = new Date(day.date + " " + day.astro.sunset).toLocaleTimeString(
-      "en-US",
-      {
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true,
-        timeZone: locationTimezone, // Use the location's time zone
-      }
+
+    // Extract hours and minutes from sunset
+    const [sunsetHours, sunsetMinutes] = day.astro.sunset
+      .split(/[:\s]/)
+      .map(Number);
+    // Create a Date object for sunset
+    const sunsetDate = new Date(
+      year,
+      month - 1,
+      dayOfMonth,
+      sunsetHours,
+      sunsetMinutes
     );
+    sunsetTime = sunsetDate.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    });
   }
 
   return (

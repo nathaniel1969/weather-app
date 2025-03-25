@@ -16,12 +16,32 @@ function HourlyForecast({ forecast, data }) {
 
   // Get the current time from the API response
   const localTimeStr = data.location.localtime;
-  let currentHour = new Date(localTimeStr).getHours();
-  const currentDay = new Date(localTimeStr).getDate();
+
+  // Extract year, month, day, hours, and minutes from localTimeStr
+  const [datePart, timePart] = localTimeStr.split(" ");
+  const [year, month, day] = datePart.split("-").map(Number);
+  const [hours, minutes] = timePart.split(":").map(Number);
+
+  // Create a Date object using the extracted components
+  const localDate = new Date(year, month - 1, day, hours, minutes);
+  let currentHour = localDate.getHours();
+  const currentDay = localDate.getDate();
 
   // Function to adjust and format hour data
   const adjustHourData = (hourData) => {
-    const hourTime = new Date(hourData.time);
+    // Extract year, month, day, hours, and minutes from hourData.time
+    const [hourDatePart, hourTimePart] = hourData.time.split(" ");
+    const [hourYear, hourMonth, hourDay] = hourDatePart.split("-").map(Number);
+    const [hourHours, hourMinutes] = hourTimePart.split(":").map(Number);
+
+    // Create a Date object using the extracted components
+    const hourTime = new Date(
+      hourYear,
+      hourMonth - 1,
+      hourDay,
+      hourHours,
+      hourMinutes
+    );
     const adjustedHour = hourTime.getHours();
     const formattedHour = adjustedHour % 12 || 12; // Convert to 12-hour format
     const ampm = adjustedHour < 12 ? "AM" : "PM";
