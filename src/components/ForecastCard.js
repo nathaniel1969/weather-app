@@ -26,21 +26,22 @@ const ForecastCard = ({ day, locationTimezone }) => {
 
   if (day.astro && day.astro.sunrise && day.astro.sunset) {
     sunriseTime = new Date(
-      day.date + " " + day.astro.sunrise + " UTC"
+      day.date + " " + day.astro.sunrise
     ).toLocaleTimeString("en-US", {
       hour: "numeric",
       minute: "numeric",
       hour12: true,
       timeZone: locationTimezone, // Use the location's time zone
     });
-    sunsetTime = new Date(
-      day.date + " " + day.astro.sunset + " UTC"
-    ).toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-      timeZone: locationTimezone, // Use the location's time zone
-    });
+    sunsetTime = new Date(day.date + " " + day.astro.sunset).toLocaleTimeString(
+      "en-US",
+      {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+        timeZone: locationTimezone, // Use the location's time zone
+      }
+    );
   }
 
   return (
