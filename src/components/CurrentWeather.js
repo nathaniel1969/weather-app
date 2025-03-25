@@ -5,25 +5,39 @@ const CurrentWeather = ({ data }) => {
 
   const { current, location } = data;
   const localTimeStr = location.localtime;
+  console.log("localTimeStr:", localTimeStr);
 
-  const formattedDate = new Date(localTimeStr).toLocaleDateString("en-US", {
+  // Extract year, month, day, hours, and minutes from localTimeStr
+  const [datePart, timePart] = localTimeStr.split(" ");
+  const [year, month, day] = datePart.split("-").map(Number);
+  const [hours, minutes] = timePart.split(":").map(Number);
+
+  // Create a Date object using the extracted components
+  const localDate = new Date(year, month - 1, day, hours, minutes);
+  console.log("localDate:", localDate);
+
+  // Format the date
+  const formattedDate = localDate.toLocaleDateString("en-US", {
     month: "short",
     day: "2-digit",
     year: "numeric",
-    timeZone: location.tz_id,
   });
+  console.log("formattedDate:", formattedDate);
 
-  const dayOfWeek = new Date(localTimeStr).toLocaleDateString("en-US", {
+  // Format the day of the week
+  const dayOfWeek = localDate.toLocaleDateString("en-US", {
     weekday: "long",
-    timeZone: location.tz_id,
   });
+  console.log("dayOfWeek:", dayOfWeek);
 
-  const formattedTime = new Date(localTimeStr).toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "numeric",
-    hour12: true,
-    timeZone: location.tz_id,
-  });
+  // Convert timePart to 12-hour format with am/pm
+  const ampm = hours >= 12 ? "pm" : "am";
+  const formattedHours = hours % 12 || 12; // Convert 0 to 12 for midnight
+  const formattedTime = `${formattedHours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")} ${ampm}`;
+
+  console.log("formattedTime:", formattedTime);
 
   return (
     <div className="card mb-4">

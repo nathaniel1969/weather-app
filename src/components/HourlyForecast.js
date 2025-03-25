@@ -16,9 +16,8 @@ function HourlyForecast({ forecast, data }) {
 
   // Get the current time from the API response
   const localTimeStr = data.location.localtime;
-  const localTime = new Date(localTimeStr);
-  let currentHour = localTime.getHours();
-  const currentDay = localTime.getDate();
+  let currentHour = new Date(localTimeStr).getHours();
+  const currentDay = new Date(localTimeStr).getDate();
 
   // Function to adjust and format hour data
   const adjustHourData = (hourData) => {
