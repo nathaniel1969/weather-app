@@ -1,8 +1,10 @@
 import React from "react";
+import { useUnit } from "../context/UnitContext";
 
 const CurrentWeather = ({ data }) => {
   if (!data) return null;
 
+  const { unit } = useUnit();
   const { current, location } = data;
   const localTimeStr = location.localtime;
   console.log("localTimeStr:", localTimeStr);
@@ -39,6 +41,12 @@ const CurrentWeather = ({ data }) => {
 
   console.log("formattedTime:", formattedTime);
 
+  // Determine temperature and feels like based on unit
+  const temp = unit === "imperial" ? current.temp_f : current.temp_c;
+  const feelsLike =
+    unit === "imperial" ? current.feelslike_f : current.feelslike_c;
+  const tempUnit = unit === "imperial" ? "°F" : "°C";
+
   return (
     <div className="card mb-4">
       <div className="card-body">
@@ -55,11 +63,17 @@ const CurrentWeather = ({ data }) => {
             className="me-3"
           />
           <div>
-            <h3 className="mb-0">{current.temp_f}°F</h3>
+            <h3 className="mb-0">
+              {temp}
+              {tempUnit}
+            </h3>
             <p className="mb-0">{current.condition.text}</p>
           </div>
         </div>
-        <p className="card-text">Feels Like: {current.feelslike_f}°F</p>
+        <p className="card-text">
+          Feels Like: {feelsLike}
+          {tempUnit}
+        </p>
         <p className="card-text">
           Wind: {current.wind_mph} mph {current.wind_dir}
         </p>

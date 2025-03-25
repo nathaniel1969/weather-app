@@ -1,4 +1,5 @@
 import React from "react";
+import { useUnit } from "../context/UnitContext";
 
 function HourlyForecast({ forecast, data }) {
   console.log("Forecast in HourlyForecast:", forecast);
@@ -13,6 +14,8 @@ function HourlyForecast({ forecast, data }) {
   ) {
     return <div>No hourly forecast available.</div>;
   }
+
+  const { unit } = useUnit();
 
   // Get the current time from the API response
   const localTimeStr = data.location.localtime;
@@ -76,6 +79,7 @@ function HourlyForecast({ forecast, data }) {
   }
   adjustedForecast = adjustedForecast.slice(0, 12);
 
+  const tempUnit = unit === "imperial" ? "°F" : "°C";
   return (
     <div className="hourly-forecast">
       <h2 className="text-center mb-3">Hourly Forecast</h2>
@@ -91,7 +95,8 @@ function HourlyForecast({ forecast, data }) {
                   className="weather-icon"
                 />
                 <p className="card-text">
-                  {hour.temp_f}°F / {hour.temp_c}°C
+                  {unit === "imperial" ? hour.temp_f : hour.temp_c}
+                  {tempUnit}
                 </p>
                 <p className="card-text">{hour.condition.text}</p>
               </div>

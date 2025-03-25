@@ -1,9 +1,12 @@
 import React from "react";
+import { useUnit } from "../context/UnitContext";
 
 const ForecastCard = ({ day, locationTimezone }) => {
   if (!day || !day.astro) {
     return null;
   }
+
+  const { unit } = useUnit();
 
   // Extract year, month, and day from day.date
   const [year, month, dayOfMonth] = day.date.split("-").map(Number);
@@ -64,6 +67,10 @@ const ForecastCard = ({ day, locationTimezone }) => {
       hour12: true,
     });
   }
+  // Determine temperature and feels like based on unit
+  const maxTemp = unit === "imperial" ? day.day.maxtemp_f : day.day.maxtemp_c;
+  const minTemp = unit === "imperial" ? day.day.mintemp_f : day.day.mintemp_c;
+  const tempUnit = unit === "imperial" ? "°F" : "°C";
 
   return (
     <div className="card rounded-3 mb-3">
@@ -76,7 +83,9 @@ const ForecastCard = ({ day, locationTimezone }) => {
           className="mb-2"
         />
         <p className="card-text">
-          High: {day.day.maxtemp_f}°F / Low: {day.day.mintemp_f}°F
+          High: {maxTemp}
+          {tempUnit} / Low: {minTemp}
+          {tempUnit}
         </p>
         <p className="card-text">
           {day.day.daily_chance_of_rain > 0

@@ -5,6 +5,7 @@ import DailyForecast from "./components/DailyForecast";
 import HourlyForecast from "./components/HourlyForecast";
 import { getWeatherData } from "./api";
 import "./App.css";
+import UnitToggle from "./components/UnitToggle"; // Import the toggle
 
 function App() {
   const [weatherData, setWeatherData] = useState(null);
@@ -39,7 +40,10 @@ function App() {
 
   return (
     <div className="container mt-5">
-      <h1 className="text-center mb-4">Weather App</h1>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h1 className="text-center">Weather App</h1>
+        <UnitToggle /> {/* Add the toggle here */}
+      </div>
       <SearchBar onSearch={handleSearch} />
       {isLoading && <div className="text-center">Loading...</div>}
       {error && <div className="text-center text-danger">{error}</div>}
