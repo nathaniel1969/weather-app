@@ -35,13 +35,13 @@ const SearchBar = ({ onSearch }) => {
     } else {
       onSearch(location); // Fallback to the location name if no suggestions
     }
+    setLocation("");
+    setSuggestions([]);
     setShowSuggestions(false);
   };
 
   const handleSuggestionClick = (suggestion) => {
-    setLocation(
-      suggestion.name + ", " + suggestion.region + ", " + suggestion.country
-    ); // Update the input with the full location name
+    setLocation("");
     onSearch(suggestion.url); // Use the url for the search
     setSuggestions([]);
     setShowSuggestions(false);

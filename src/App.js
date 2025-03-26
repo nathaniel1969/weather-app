@@ -10,6 +10,7 @@ import UnitToggle from "./components/UnitToggle"; // Import the toggle
 function App() {
   const [weatherData, setWeatherData] = useState(null);
   const [location, setLocation] = useState("New York");
+  const [displayLocation, setDisplayLocation] = useState("New York");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -20,6 +21,11 @@ function App() {
       try {
         const data = await getWeatherData(location);
         setWeatherData(data);
+        if (data && data.location) {
+          setDisplayLocation(
+            `${data.location.name}, ${data.location.region}, ${data.location.country}`
+          );
+        }
       } catch (error) {
         console.error("Error in App.js:", error);
         setError("Failed to load weather data.");
@@ -32,7 +38,6 @@ function App() {
   }, [location]);
 
   const handleSearch = (newLocation) => {
-    console.log("handleSearch in App.js - newLocation:", newLocation); // Log the new location
     setLocation(newLocation);
   };
 
