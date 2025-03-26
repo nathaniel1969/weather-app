@@ -1,16 +1,16 @@
+// src/App.js
 import React, { useState, useEffect } from "react";
 import SearchBar from "./components/SearchBar";
 import CurrentWeather from "./components/CurrentWeather";
 import DailyForecast from "./components/DailyForecast";
-import HourlyForecast from "./components/HourlyForecast";
 import { getWeatherData } from "./api";
 import "./App.css";
 import UnitToggle from "./components/UnitToggle"; // Import the toggle
+import HourlyTemperatureChart from "./components/HourlyTemperatureChart"; // Import the new component
 
 function App() {
   const [weatherData, setWeatherData] = useState(null);
   const [location, setLocation] = useState("New York");
-  const [displayLocation, setDisplayLocation] = useState("New York");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -21,11 +21,6 @@ function App() {
       try {
         const data = await getWeatherData(location);
         setWeatherData(data);
-        if (data && data.location) {
-          setDisplayLocation(
-            `${data.location.name}, ${data.location.region}, ${data.location.country}`
-          );
-        }
       } catch (error) {
         console.error("Error in App.js:", error);
         setError("Failed to load weather data.");
@@ -55,7 +50,10 @@ function App() {
         <DailyForecast forecast={weatherData.forecast} data={weatherData} />
       )}
       {!isLoading && weatherData && (
-        <HourlyForecast forecast={weatherData.forecast} data={weatherData} /> // Pass the entire weatherData
+        <HourlyTemperatureChart
+          forecast={weatherData.forecast}
+          data={weatherData}
+        />
       )}
     </div>
   );
