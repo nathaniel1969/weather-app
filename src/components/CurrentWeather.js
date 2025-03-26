@@ -9,7 +9,6 @@ const CurrentWeather = ({ data }) => {
 
   const { current, location } = data;
   const localTimeStr = location.localtime;
-  console.log("localTimeStr:", localTimeStr);
 
   // Extract year, month, day, hours, and minutes from localTimeStr
   const [datePart, timePart] = localTimeStr.split(" ");
@@ -18,7 +17,6 @@ const CurrentWeather = ({ data }) => {
 
   // Create a Date object using the extracted components
   const localDate = new Date(year, month - 1, day, hours, minutes);
-  console.log("localDate:", localDate);
 
   // Format the date
   const formattedDate = localDate.toLocaleDateString("en-US", {
@@ -26,13 +24,11 @@ const CurrentWeather = ({ data }) => {
     day: "2-digit",
     year: "numeric",
   });
-  console.log("formattedDate:", formattedDate);
 
   // Format the day of the week
   const dayOfWeek = localDate.toLocaleDateString("en-US", {
     weekday: "long",
   });
-  console.log("dayOfWeek:", dayOfWeek);
 
   // Convert timePart to 12-hour format with am/pm
   const ampm = hours >= 12 ? "pm" : "am";
@@ -40,8 +36,6 @@ const CurrentWeather = ({ data }) => {
   const formattedTime = `${formattedHours.toString().padStart(2, "0")}:${minutes
     .toString()
     .padStart(2, "0")} ${ampm}`;
-
-  console.log("formattedTime:", formattedTime);
 
   // Determine temperature based on unit
   const temp = unit === "imperial" ? current.temp_f : current.temp_c;

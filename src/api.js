@@ -9,7 +9,7 @@ export const getWeatherData = async (location) => {
       params: {
         key: API_KEY,
         q: location,
-        days: 14, 
+        days: 14,
         aqi: "yes",
         alerts: "yes",
       },
@@ -18,5 +18,20 @@ export const getWeatherData = async (location) => {
   } catch (error) {
     console.error("Error fetching weather data:", error);
     throw error;
+  }
+};
+
+export const searchLocations = async (query) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/search.json`, {
+      params: {
+        key: API_KEY,
+        q: query,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error searching locations:", error);
+    return []; // Return an empty array on error to avoid breaking the UI
   }
 };

@@ -6,9 +6,6 @@ function HourlyForecast({ forecast, data }) {
   const { unit } = useUnit();
   const [hoursToShow, setHoursToShow] = useState(12); // Default to 12 hours
 
-  console.log("Forecast in HourlyForecast:", forecast);
-  console.log("Data in HourlyForecast:", data);
-
   // Now, the conditional return
   if (
     !forecast ||

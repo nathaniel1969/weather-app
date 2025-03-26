@@ -19,7 +19,6 @@ function App() {
       setError(null);
       try {
         const data = await getWeatherData(location);
-        console.log("API Response (App.js):", data); // Check API response
         setWeatherData(data);
       } catch (error) {
         console.error("Error in App.js:", error);
@@ -32,9 +31,8 @@ function App() {
     fetchData();
   }, [location]);
 
-  console.log("weatherData (App.js):", weatherData); // Check weatherData state
-
   const handleSearch = (newLocation) => {
+    console.log("handleSearch in App.js - newLocation:", newLocation); // Log the new location
     setLocation(newLocation);
   };
 
