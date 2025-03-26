@@ -2,9 +2,11 @@ import React from "react";
 import { useUnit } from "../context/UnitContext";
 
 const CurrentWeather = ({ data }) => {
+  // Call the hook FIRST, before any conditional returns
+  const { unit } = useUnit();
+
   if (!data) return null;
 
-  const { unit } = useUnit();
   const { current, location } = data;
   const localTimeStr = location.localtime;
   console.log("localTimeStr:", localTimeStr);
@@ -41,11 +43,31 @@ const CurrentWeather = ({ data }) => {
 
   console.log("formattedTime:", formattedTime);
 
-  // Determine temperature and feels like based on unit
+  // Determine temperature based on unit
   const temp = unit === "imperial" ? current.temp_f : current.temp_c;
+  const tempUnit = unit === "imperial" ? "°F" : "°C";
+
+  // Determine feels like based on unit
   const feelsLike =
     unit === "imperial" ? current.feelslike_f : current.feelslike_c;
-  const tempUnit = unit === "imperial" ? "°F" : "°C";
+
+  // Determine wind chill based on unit
+  const windChill =
+    unit === "imperial" ? current.windchill_f : current.windchill_c;
+
+  // Determine wind speed and gust based on unit
+  const windSpeed = unit === "imperial" ? current.wind_mph : current.wind_kph;
+  const windGust = unit === "imperial" ? current.gust_mph : current.gust_kph;
+  const windSpeedUnit = unit === "imperial" ? "mph" : "kph";
+
+  // Determine pressure based on unit
+  const pressure =
+    unit === "imperial" ? current.pressure_in : current.pressure_mb;
+  const pressureUnit = unit === "imperial" ? "inHg" : "mb";
+
+  // Determine visibility based on unit
+  const visibility = unit === "imperial" ? current.vis_miles : current.vis_km;
+  const visibilityUnit = unit === "imperial" ? "miles" : "km";
 
   return (
     <div className="card mb-4">
@@ -56,7 +78,7 @@ const CurrentWeather = ({ data }) => {
         <p className="card-text">
           {formattedDate}, {dayOfWeek} {formattedTime}
         </p>
-        <div className="d-flex align-items-center">
+        <div className="d-flex align-items-center mb-3">
           <img
             src={current.condition.icon}
             alt={current.condition.text}
@@ -70,14 +92,37 @@ const CurrentWeather = ({ data }) => {
             <p className="mb-0">{current.condition.text}</p>
           </div>
         </div>
-        <p className="card-text">
-          Feels Like: {feelsLike}
-          {tempUnit}
-        </p>
-        <p className="card-text">
-          Wind: {current.wind_mph} mph {current.wind_dir}
-        </p>
-        <p className="card-text">Humidity: {current.humidity}%</p>
+        <div className="row">
+          <div className="col-md-6">
+            <p className="card-text">
+              Feels Like: {feelsLike}
+              {tempUnit}
+            </p>
+            {/* Display wind chill only if it's available */}
+            {current.windchill_f !== undefined &&
+              current.windchill_c !== undefined && (
+                <p className="card-text">
+                  Wind Chill: {windChill}
+                  {tempUnit}
+                </p>
+              )}
+            <p className="card-text">
+              Wind: {windSpeed} {windSpeedUnit} {current.wind_dir}
+            </p>
+            <p className="card-text">
+              Wind Gust: {windGust} {windSpeedUnit}
+            </p>
+          </div>
+          <div className="col-md-6">
+            <p className="card-text">
+              Pressure: {pressure} {pressureUnit}
+            </p>
+            <p className="card-text">
+              Visibility: {visibility} {visibilityUnit}
+            </p>
+            <p className="card-text">Humidity: {current.humidity}%</p>
+          </div>
+        </div>
       </div>
     </div>
   );
