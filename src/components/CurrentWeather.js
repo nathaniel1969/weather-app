@@ -7,7 +7,7 @@ const CurrentWeather = ({ data }) => {
 
   if (!data) return null;
 
-  const { current, location } = data;
+  const { current, location, alerts } = data;
   const localTimeStr = location.localtime;
 
   // Extract year, month, day, hours, and minutes from localTimeStr
@@ -33,7 +33,8 @@ const CurrentWeather = ({ data }) => {
   // Convert timePart to 12-hour format with am/pm
   const ampm = hours >= 12 ? "pm" : "am";
   const formattedHours = hours % 12 || 12; // Convert 0 to 12 for midnight
-  const formattedTime = `${formattedHours.toString().padStart(2, "0")}:${minutes
+  // Remove the zero padding for the hour
+  const formattedTime = `${formattedHours}:${minutes
     .toString()
     .padStart(2, "0")} ${ampm}`;
 
@@ -48,6 +49,14 @@ const CurrentWeather = ({ data }) => {
   // Determine wind chill based on unit
   const windChill =
     unit === "imperial" ? current.windchill_f : current.windchill_c;
+
+  // Determine heat index based on unit
+  const heatIndex =
+    unit === "imperial" ? current.heatindex_f : current.heatindex_c;
+
+  // Determine dew point based on unit
+  const dewPoint =
+    unit === "imperial" ? current.dewpoint_f : current.dewpoint_c;
 
   // Determine wind speed and gust based on unit
   const windSpeed = unit === "imperial" ? current.wind_mph : current.wind_kph;
@@ -100,6 +109,14 @@ const CurrentWeather = ({ data }) => {
                   {tempUnit}
                 </p>
               )}
+            {/* Display heat index only if it's available */}
+            {current.heatindex_f !== undefined &&
+              current.heatindex_c !== undefined && (
+                <p className="card-text">
+                  Heat Index: {heatIndex}
+                  {tempUnit}
+                </p>
+              )}
             <p className="card-text">
               Wind: {windSpeed} {windSpeedUnit} {current.wind_dir}
             </p>
@@ -115,8 +132,30 @@ const CurrentWeather = ({ data }) => {
               Visibility: {visibility} {visibilityUnit}
             </p>
             <p className="card-text">Humidity: {current.humidity}%</p>
+            <p className="card-text">UV Index: {current.uv}</p>
+            {/* Display dew point only if it's available */}
+            {current.dewpoint_f !== undefined &&
+              current.dewpoint_c !== undefined && (
+                <p className="card-text">
+                  Dew Point: {dewPoint}
+                  {tempUnit}
+                </p>
+              )}
           </div>
         </div>
+        {/* Display alerts if there are any */}
+        {alerts && alerts.alert && alerts.alert.length > 0 && (
+          <div className="mt-3">
+            <h4 className="text-danger">Weather Alerts:</h4>
+            <ul>
+              {alerts.alert.map((alert, index) => (
+                <li key={index} className="text-danger">
+                  {alert.headline} - {alert.desc}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );
