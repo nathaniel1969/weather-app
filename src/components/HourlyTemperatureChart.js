@@ -1,6 +1,7 @@
 // src/components/HourlyTemperatureChart.js
 import React, { useState } from "react";
 import { Line } from "react-chartjs-2";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -15,6 +16,7 @@ import { useUnit } from "../context/UnitContext";
 
 ChartJS.register(
   CategoryScale,
+  ChartDataLabels,
   LinearScale,
   PointElement,
   LineElement,
@@ -117,6 +119,8 @@ const HourlyTemperatureChart = ({ forecast, data }) => {
         fill: false,
         borderColor: "rgb(75, 192, 192)", // Teal
         tension: 0.1,
+        pointRadius: 5, // Make the points more visible
+        pointHoverRadius: 8, // Increase the size of the point on hover
       },
     ],
   };
@@ -131,13 +135,33 @@ const HourlyTemperatureChart = ({ forecast, data }) => {
         display: true,
         text: "Hourly Temperature Trend",
       },
+      tooltip: {
+        enabled: false, // Disable the default tooltip
+      },
+      datalabels: {
+        anchor: "end",
+        align: "top",
+        formatter: (value) => `${value}°`, // Format the label to include the degree symbol
+      },
     },
     scales: {
       x: {
         position: "top", // Move x-axis labels to the top
+        grid: {
+          display: false, // Remove x-axis grid lines
+        },
+        ticks: {
+          padding: 40, // Add padding to the top of the x-axis labels
+        },
+        border: {
+          display: false, // Remove x-axis line
+        },
       },
       y: {
-        beginAtZero: false, // Don't start the y-axis at zero
+        display: false, // Remove y-axis scale
+        grid: {
+          display: false, // Remove y-axis grid lines
+        },
       },
     },
   };
