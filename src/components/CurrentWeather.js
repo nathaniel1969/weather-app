@@ -1,76 +1,132 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useUnit } from "../context/UnitContext";
+import { formatDate, formatTime } from "../utils";
 
-const CurrentWeather = ({ data }) => {
-  // Call the hook FIRST, before any conditional returns
+const CurrentWeather = React.memo(({ data }) => {
   const { unit } = useUnit();
 
-  if (!data) return null;
+  // Default values for when data is not available
+  const defaultCurrent = {
+    condition: { icon: "", text: "" },
+    temp_f: 0,
+    temp_c: 0,
+    feelslike_f: 0,
+    feelslike_c: 0,
+    windchill_f: undefined,
+    windchill_c: undefined,
+    heatindex_f: undefined,
+    heatindex_c: undefined,
+    dewpoint_f: undefined,
+    dewpoint_c: undefined,
+    wind_mph: 0,
+    wind_kph: 0,
+    wind_dir: "",
+    gust_mph: 0,
+    gust_kph: 0,
+    pressure_in: 0,
+    pressure_mb: 0,
+    vis_miles: 0,
+    vis_km: 0,
+    humidity: 0,
+    uv: 0,
+  };
+  const defaultLocation = {
+    name: "",
+    region: "",
+    country: "",
+    localtime: "",
+  };
+  const defaultAlerts = { alert: [] };
 
-  const { current, location, alerts } = data;
+  const current = data ? data.current : defaultCurrent;
+  const location = data ? data.location : defaultLocation;
+  const alerts = data ? data.alerts : defaultAlerts;
   const localTimeStr = location.localtime;
 
-  // Extract year, month, day, hours, and minutes from localTimeStr
-  const [datePart, timePart] = localTimeStr.split(" ");
-  const [year, month, day] = datePart.split("-").map(Number);
-  const [hours, minutes] = timePart.split(":").map(Number);
+  const localDate = useMemo(() => {
+    if (!localTimeStr) return new Date();
+    const [datePart, timePart] = localTimeStr.split(" ");
+    const [year, month, day] = datePart.split("-").map(Number);
+    const [hours, minutes] = timePart.split(":").map(Number);
+    return new Date(year, month - 1, day, hours, minutes);
+  }, [localTimeStr]);
 
-  // Create a Date object using the extracted components
-  const localDate = new Date(year, month - 1, day, hours, minutes);
+  const formattedDate = useMemo(
+    () =>
+      localTimeStr
+        ? formatDate(localTimeStr.split(" ")[0], {
+            month: "short",
+            day: "2-digit",
+            year: "numeric",
+          })
+        : "",
+    [localTimeStr]
+  );
+  const dayOfWeek = useMemo(
+    () =>
+      localTimeStr
+        ? formatDate(localTimeStr.split(" ")[0], { weekday: "long" })
+        : "",
+    [localTimeStr]
+  );
 
-  // Format the date
-  const formattedDate = localDate.toLocaleDateString("en-US", {
-    month: "short",
-    day: "2-digit",
-    year: "numeric",
-  });
+  const formattedTime = useMemo(
+    () =>
+      localTimeStr ? formatTime(localTimeStr.split(" ")[1], localDate) : "",
+    [localTimeStr, localDate]
+  );
 
-  // Format the day of the week
-  const dayOfWeek = localDate.toLocaleDateString("en-US", {
-    weekday: "long",
-  });
+  const temp = useMemo(
+    () => (unit === "imperial" ? current.temp_f : current.temp_c),
+    [unit, current.temp_f, current.temp_c]
+  );
+  const tempUnit = useMemo(() => (unit === "imperial" ? "°F" : "°C"), [unit]);
+  const feelsLike = useMemo(
+    () => (unit === "imperial" ? current.feelslike_f : current.feelslike_c),
+    [unit, current.feelslike_f, current.feelslike_c]
+  );
+  const windChill = useMemo(
+    () => (unit === "imperial" ? current.windchill_f : current.windchill_c),
+    [unit, current.windchill_f, current.windchill_c]
+  );
+  const heatIndex = useMemo(
+    () => (unit === "imperial" ? current.heatindex_f : current.heatindex_c),
+    [unit, current.heatindex_f, current.heatindex_c]
+  );
+  const dewPoint = useMemo(
+    () => (unit === "imperial" ? current.dewpoint_f : current.dewpoint_c),
+    [unit, current.dewpoint_f, current.dewpoint_c]
+  );
+  const windSpeed = useMemo(
+    () => (unit === "imperial" ? current.wind_mph : current.wind_kph),
+    [unit, current.wind_mph, current.wind_kph]
+  );
+  const windGust = useMemo(
+    () => (unit === "imperial" ? current.gust_mph : current.gust_kph),
+    [unit, current.gust_mph, current.gust_kph]
+  );
+  const windSpeedUnit = useMemo(
+    () => (unit === "imperial" ? "mph" : "kph"),
+    [unit]
+  );
+  const pressure = useMemo(
+    () => (unit === "imperial" ? current.pressure_in : current.pressure_mb),
+    [unit, current.pressure_in, current.pressure_mb]
+  );
+  const pressureUnit = useMemo(
+    () => (unit === "imperial" ? "inHg" : "mb"),
+    [unit]
+  );
+  const visibility = useMemo(
+    () => (unit === "imperial" ? current.vis_miles : current.vis_km),
+    [unit, current.vis_miles, current.vis_km]
+  );
+  const visibilityUnit = useMemo(
+    () => (unit === "imperial" ? "miles" : "km"),
+    [unit]
+  );
 
-  // Convert timePart to 12-hour format with am/pm
-  const ampm = hours >= 12 ? "pm" : "am";
-  const formattedHours = hours % 12 || 12; // Convert 0 to 12 for midnight
-  // Remove the zero padding for the hour
-  const formattedTime = `${formattedHours}:${minutes
-    .toString()
-    .padStart(2, "0")} ${ampm}`;
-
-  // Determine temperature based on unit
-  const temp = unit === "imperial" ? current.temp_f : current.temp_c;
-  const tempUnit = unit === "imperial" ? "°F" : "°C";
-
-  // Determine feels like based on unit
-  const feelsLike =
-    unit === "imperial" ? current.feelslike_f : current.feelslike_c;
-
-  // Determine wind chill based on unit
-  const windChill =
-    unit === "imperial" ? current.windchill_f : current.windchill_c;
-
-  // Determine heat index based on unit
-  const heatIndex =
-    unit === "imperial" ? current.heatindex_f : current.heatindex_c;
-
-  // Determine dew point based on unit
-  const dewPoint =
-    unit === "imperial" ? current.dewpoint_f : current.dewpoint_c;
-
-  // Determine wind speed and gust based on unit
-  const windSpeed = unit === "imperial" ? current.wind_mph : current.wind_kph;
-  const windGust = unit === "imperial" ? current.gust_mph : current.gust_kph;
-  const windSpeedUnit = unit === "imperial" ? "mph" : "kph";
-
-  // Determine pressure based on unit
-  const pressure =
-    unit === "imperial" ? current.pressure_in : current.pressure_mb;
-  const pressureUnit = unit === "imperial" ? "inHg" : "mb";
-
-  // Determine visibility based on unit
-  const visibility = unit === "imperial" ? current.vis_miles : current.vis_km;
-  const visibilityUnit = unit === "imperial" ? "miles" : "km";
+  if (!data) return null;
 
   return (
     <div className="card mb-4">
@@ -159,6 +215,6 @@ const CurrentWeather = ({ data }) => {
       </div>
     </div>
   );
-};
+});
 
 export default CurrentWeather;

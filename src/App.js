@@ -1,5 +1,5 @@
 // src/App.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import SearchBar from "./components/SearchBar";
 import CurrentWeather from "./components/CurrentWeather";
 import DailyForecast from "./components/DailyForecast";
@@ -7,12 +7,34 @@ import { getWeatherData } from "./api";
 import "./App.css";
 import UnitToggle from "./components/UnitToggle"; // Import the toggle
 import HourlyTemperatureChart from "./components/HourlyTemperatureChart"; // Import the new component
+import HourlyForecast from "./components/HourlyForecast";
+import { processHourlyForecast } from "./utils";
 
 function App() {
   const [weatherData, setWeatherData] = useState(null);
   const [location, setLocation] = useState("New York");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [hoursToShow, setHoursToShow] = useState(12);
+
+  const localDate = useMemo(() => {
+    if (
+      !weatherData ||
+      !weatherData.location ||
+      !weatherData.location.localtime
+    )
+      return null;
+    const localTimeStr = weatherData.location.localtime;
+    const [datePart, timePart] = localTimeStr.split(" ");
+    const [year, month, day] = datePart.split("-").map(Number);
+    const [hours, minutes] = timePart.split(":").map(Number);
+    return new Date(year, month - 1, day, hours, minutes);
+  }, [weatherData]);
+
+  const adjustedForecast = useMemo(() => {
+    if (!weatherData || !weatherData.forecast || !localDate) return [];
+    return processHourlyForecast(weatherData.forecast, localDate, hoursToShow);
+  }, [weatherData, localDate, hoursToShow]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,9 +72,17 @@ function App() {
         <DailyForecast forecast={weatherData.forecast} data={weatherData} />
       )}
       {!isLoading && weatherData && (
+        <HourlyForecast
+          adjustedForecast={adjustedForecast}
+          hoursToShow={hoursToShow}
+          setHoursToShow={setHoursToShow}
+        />
+      )}
+      {!isLoading && weatherData && (
         <HourlyTemperatureChart
-          forecast={weatherData.forecast}
-          data={weatherData}
+          adjustedForecast={adjustedForecast}
+          hoursToShow={hoursToShow}
+          setHoursToShow={setHoursToShow}
         />
       )}
     </div>

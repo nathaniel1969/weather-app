@@ -1,91 +1,118 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useUnit } from "../context/UnitContext";
+import { formatDate, formatTime } from "../utils";
 
-const ForecastCard = ({ day, locationTimezone }) => {
-  // Call the hook FIRST, before any conditional returns
+const ForecastCard = React.memo(({ day }) => {
   const { unit } = useUnit();
+
+  // Default values for when day or day.astro is not available
+  const defaultDay = {
+    date: "",
+    day: {
+      maxtemp_f: 0,
+      maxtemp_c: 0,
+      mintemp_f: 0,
+      mintemp_c: 0,
+      maxwind_mph: 0,
+      maxwind_kph: 0,
+      condition: { icon: "", text: "" },
+      daily_chance_of_rain: 0,
+      daily_chance_of_snow: 0,
+      avgvis_miles: 0,
+      avgvis_km: 0,
+      avghumidity: 0,
+      uv: 0,
+      wind_dir: "",
+    },
+    totalprecip_in: 0,
+    totalprecip_mm: 0,
+    astro: { sunrise: "", sunset: "" },
+  };
+
+  const currentDay = day || defaultDay;
+
+  const date = useMemo(() => {
+    if (!currentDay.date) return new Date();
+    const [year, month, dayOfMonth] = currentDay.date.split("-").map(Number);
+    return new Date(year, month - 1, dayOfMonth);
+  }, [currentDay.date]);
+
+  const dayOfWeek = useMemo(
+    () =>
+      currentDay.date ? formatDate(currentDay.date, { weekday: "long" }) : "",
+    [currentDay.date]
+  );
+  const formattedDate = useMemo(
+    () =>
+      currentDay.date
+        ? formatDate(currentDay.date, {
+            month: "short",
+            day: "2-digit",
+            year: "numeric",
+          })
+        : "",
+    [currentDay.date]
+  );
+
+  const sunriseTime = useMemo(() => {
+    if (currentDay.astro && currentDay.astro.sunrise) {
+      return formatTime(currentDay.astro.sunrise, date);
+    }
+    return "";
+  }, [currentDay.astro, date]);
+
+  const sunsetTime = useMemo(() => {
+    if (currentDay.astro && currentDay.astro.sunset) {
+      return formatTime(currentDay.astro.sunset, date);
+    }
+    return "";
+  }, [currentDay.astro, date]);
+
+  const maxTemp = useMemo(
+    () =>
+      unit === "imperial" ? currentDay.day.maxtemp_f : currentDay.day.maxtemp_c,
+    [unit, currentDay.day.maxtemp_f, currentDay.day.maxtemp_c]
+  );
+  const minTemp = useMemo(
+    () =>
+      unit === "imperial" ? currentDay.day.mintemp_f : currentDay.day.mintemp_c,
+    [unit, currentDay.day.mintemp_f, currentDay.day.mintemp_c]
+  );
+  const tempUnit = useMemo(() => (unit === "imperial" ? "°F" : "°C"), [unit]);
+
+  const maxWind = useMemo(
+    () =>
+      unit === "imperial"
+        ? currentDay.day.maxwind_mph
+        : currentDay.day.maxwind_kph,
+    [unit, currentDay.day.maxwind_mph, currentDay.day.maxwind_kph]
+  );
+  const windSpeedUnit = useMemo(
+    () => (unit === "imperial" ? "mph" : "kph"),
+    [unit]
+  );
+
+  const totalPrecip = useMemo(
+    () =>
+      unit === "imperial"
+        ? currentDay.totalprecip_in
+        : currentDay.totalprecip_mm,
+    [unit, currentDay.totalprecip_in, currentDay.totalprecip_mm]
+  );
+  const precipUnit = useMemo(() => (unit === "imperial" ? "in" : "mm"), [unit]);
+
+  const avgVis = useMemo(
+    () =>
+      unit === "imperial"
+        ? currentDay.day.avgvis_miles
+        : currentDay.day.avgvis_km,
+    [unit, currentDay.day.avgvis_miles, currentDay.day.avgvis_km]
+  );
+  const visUnit = useMemo(() => (unit === "imperial" ? "miles" : "km"), [unit]);
 
   if (!day || !day.astro) {
     return null;
   }
-
-  // Extract year, month, and day from day.date
-  const [year, month, dayOfMonth] = day.date.split("-").map(Number);
-
-  // Create a Date object using the extracted components
-  const date = new Date(year, month - 1, dayOfMonth);
-
-  // Format the day of the week
-  const dayOfWeek = date.toLocaleDateString("en-US", {
-    weekday: "long",
-  });
-
-  // Format the date
-  const formattedDate = date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "2-digit",
-    year: "numeric",
-  });
-
-  // Extract sunrise and sunset times
-  let sunriseTime = "";
-  let sunsetTime = "";
-
-  if (day.astro && day.astro.sunrise && day.astro.sunset) {
-    // Extract hours and minutes from sunrise
-    const [sunriseHours, sunriseMinutes] = day.astro.sunrise
-      .split(/[:\s]/)
-      .map(Number);
-    // Create a Date object for sunrise
-    const sunriseDate = new Date(
-      year,
-      month - 1,
-      dayOfMonth,
-      sunriseHours,
-      sunriseMinutes
-    );
-    sunriseTime = sunriseDate.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    });
-
-    // Extract hours and minutes from sunset
-    const [sunsetHours, sunsetMinutes] = day.astro.sunset
-      .split(/[:\s]/)
-      .map(Number);
-    // Create a Date object for sunset
-    const sunsetDate = new Date(
-      year,
-      month - 1,
-      dayOfMonth,
-      sunsetHours,
-      sunsetMinutes
-    );
-    sunsetTime = sunsetDate.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    });
-  }
-  // Determine temperature based on unit
-  const maxTemp = unit === "imperial" ? day.day.maxtemp_f : day.day.maxtemp_c;
-  const minTemp = unit === "imperial" ? day.day.mintemp_f : day.day.mintemp_c;
-  const tempUnit = unit === "imperial" ? "°F" : "°C";
-
-  // Determine wind speed based on unit
-  const maxWind =
-    unit === "imperial" ? day.day.maxwind_mph : day.day.maxwind_kph;
-  const windSpeedUnit = unit === "imperial" ? "mph" : "kph";
-
-  //Determine total precipitation based on unit
-  const totalPrecip =
-    unit === "imperial" ? day.totalprecip_in : day.totalprecip_mm;
-  const precipUnit = unit === "imperial" ? "in" : "mm";
-
-  //Determine average visibility based on unit
-  const avgVis = unit === "imperial" ? day.day.avgvis_miles : day.day.avgvis_km;
-  const visUnit = unit === "imperial" ? "miles" : "km";
 
   return (
     <div className="card rounded-3 mb-3">
@@ -93,8 +120,8 @@ const ForecastCard = ({ day, locationTimezone }) => {
         <h5 className="card-title">{dayOfWeek}</h5>
         <p className="card-text">{formattedDate}</p>
         <img
-          src={day.day.condition.icon}
-          alt={day.day.condition.text}
+          src={currentDay.day.condition.icon}
+          alt={currentDay.day.condition.text}
           className="mb-2"
         />
         <p className="card-text">
@@ -102,12 +129,15 @@ const ForecastCard = ({ day, locationTimezone }) => {
           {tempUnit} / Low: {minTemp}
           {tempUnit}
         </p>
-        {/* Conditionally render precipitation information */}
-        {day.day.daily_chance_of_rain > 0 && (
-          <p className="card-text">Rain: {day.day.daily_chance_of_rain}%</p>
+        {currentDay.day.daily_chance_of_rain > 0 && (
+          <p className="card-text">
+            Rain: {currentDay.day.daily_chance_of_rain}%
+          </p>
         )}
-        {day.day.daily_chance_of_snow > 0 && (
-          <p className="card-text">Snow: {day.day.daily_chance_of_snow}%</p>
+        {currentDay.day.daily_chance_of_snow > 0 && (
+          <p className="card-text">
+            Snow: {currentDay.day.daily_chance_of_snow}%
+          </p>
         )}
         {totalPrecip > 0 && (
           <p className="card-text">
@@ -115,19 +145,20 @@ const ForecastCard = ({ day, locationTimezone }) => {
           </p>
         )}
         <p className="card-text">
-          Wind: {maxWind} {windSpeedUnit} {day.day.wind_dir}
+          Wind: {maxWind} {windSpeedUnit} {currentDay.day.wind_dir}
         </p>
         <p className="card-text">
           Average Visibility: {avgVis} {visUnit}
         </p>
-        <p className="card-text">Average Humidity: {day.day.avghumidity}%</p>
-        <p className="card-text">UV Index: {day.day.uv}</p>
-        {/* Display sunrise and sunset times on separate lines */}
+        <p className="card-text">
+          Average Humidity: {currentDay.day.avghumidity}%
+        </p>
+        <p className="card-text">UV Index: {currentDay.day.uv}</p>
         <p className="card-text">Sunrise: {sunriseTime}</p>
         <p className="card-text">Sunset: {sunsetTime}</p>
       </div>
     </div>
   );
-};
+});
 
 export default ForecastCard;

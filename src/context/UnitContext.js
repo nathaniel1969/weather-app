@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useCallback } from "react";
 
 const UnitContext = createContext();
 
@@ -7,13 +7,11 @@ export const useUnit = () => useContext(UnitContext);
 export const UnitProvider = ({ children }) => {
   const [unit, setUnit] = useState("imperial"); // Default to imperial
 
-  const toggleUnit = () => {
-    setUnit(unit === "imperial" ? "metric" : "imperial");
-  };
+  const toggleUnit = useCallback(() => {
+    setUnit((prevUnit) => (prevUnit === "imperial" ? "metric" : "imperial"));
+  }, []);
 
-  return (
-    <UnitContext.Provider value={{ unit, toggleUnit }}>
-      {children}
-    </UnitContext.Provider>
-  );
+  const value = { unit, toggleUnit };
+
+  return <UnitContext.Provider value={value}>{children}</UnitContext.Provider>;
 };

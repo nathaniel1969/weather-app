@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { searchLocations } from "../api";
 
 const SearchBar = ({ onSearch }) => {
@@ -7,18 +7,18 @@ const SearchBar = ({ onSearch }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchBarRef = useRef(null);
 
-  useEffect(() => {
-    const fetchSuggestions = async () => {
-      if (location.length > 2) {
-        const results = await searchLocations(location);
-        setSuggestions(results);
-        setShowSuggestions(true);
-      } else {
-        setSuggestions([]);
-        setShowSuggestions(false);
-      }
-    };
+  const fetchSuggestions = useCallback(async () => {
+    if (location.length > 2) {
+      const results = await searchLocations(location);
+      setSuggestions(results);
+      setShowSuggestions(true);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [location]);
 
+  useEffect(() => {
     const debounce = setTimeout(() => {
       fetchSuggestions();
     }, 300); // Debounce for 300ms
@@ -26,32 +26,38 @@ const SearchBar = ({ onSearch }) => {
     return () => {
       clearTimeout(debounce);
     };
-  }, [location]);
+  }, [fetchSuggestions]);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    if (suggestions.length > 0) {
-      onSearch(suggestions[0].url); // Use the url for the search
-    } else {
-      onSearch(location); // Fallback to the location name if no suggestions
-    }
-    setLocation("");
-    setSuggestions([]);
-    setShowSuggestions(false);
-  };
+  const handleSubmit = useCallback(
+    (event) => {
+      event.preventDefault();
+      if (suggestions.length > 0) {
+        onSearch(suggestions[0].url); // Use the url for the search
+      } else {
+        onSearch(location); // Fallback to the location name if no suggestions
+      }
+      setLocation("");
+      setSuggestions([]);
+      setShowSuggestions(false);
+    },
+    [suggestions, location, onSearch]
+  );
 
-  const handleSuggestionClick = (suggestion) => {
-    setLocation("");
-    onSearch(suggestion.url); // Use the url for the search
-    setSuggestions([]);
-    setShowSuggestions(false);
-  };
+  const handleSuggestionClick = useCallback(
+    (suggestion) => {
+      setLocation("");
+      onSearch(suggestion.url); // Use the url for the search
+      setSuggestions([]);
+      setShowSuggestions(false);
+    },
+    [onSearch]
+  );
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     setLocation(e.target.value);
-  };
+  }, []);
 
-  const handleBlur = () => {
+  const handleBlur = useCallback(() => {
     setTimeout(() => {
       if (
         searchBarRef.current &&
@@ -60,7 +66,7 @@ const SearchBar = ({ onSearch }) => {
         setShowSuggestions(false);
       }
     }, 100);
-  };
+  }, []);
 
   return (
     <div

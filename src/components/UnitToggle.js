@@ -1,7 +1,7 @@
 import React from "react";
 import { useUnit } from "../context/UnitContext";
 
-const UnitToggle = () => {
+const UnitToggle = React.memo(() => {
   const { unit, toggleUnit } = useUnit();
 
   return (
@@ -18,6 +18,6 @@ const UnitToggle = () => {
       </label>
     </div>
   );
-};
+});
 
 export default UnitToggle;
