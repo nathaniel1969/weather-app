@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API_KEY = "f7eda145a7984e599f8161315252103"; // Replace with your actual API key
-const BASE_URL = "http://api.weatherapi.com/v1";
+const BASE_URL = "https://api.weatherapi.com/v1"; // Changed to HTTPS
 
 export const getWeatherData = async (location) => {
   try {
