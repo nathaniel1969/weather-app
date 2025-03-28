@@ -35,3 +35,23 @@ export const searchLocations = async (query) => {
     return []; // Return an empty array on error to avoid breaking the UI
   }
 };
+
+// New function for reverse geocoding
+export const getLocationFromCoordinates = async (latitude, longitude) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/search.json`, {
+      params: {
+        key: API_KEY,
+        q: `${latitude},${longitude}`, // Pass coordinates as a string
+      },
+    });
+    if (response.data && response.data.length > 0) {
+      return response.data[0].url; // Return the url of the first result
+    } else {
+      return null; // Return null if no location is found
+    }
+  } catch (error) {
+    console.error("Error getting location from coordinates:", error);
+    return null; // Return null on error
+  }
+};
