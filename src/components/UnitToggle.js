@@ -12,6 +12,11 @@ const UnitToggle = React.memo(() => {
         id="unitToggle"
         checked={unit === "metric"}
         onChange={toggleUnit}
+        aria-label={
+          unit === "imperial"
+            ? "Switch to Metric Units"
+            : "Switch to Imperial Units"
+        }
       />
       <label className="form-check-label" htmlFor="unitToggle">
         {unit === "imperial" ? "Imperial" : "Metric"}

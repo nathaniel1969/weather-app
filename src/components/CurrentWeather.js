@@ -131,9 +131,9 @@ const CurrentWeather = React.memo(({ data }) => {
   return (
     <div className="card mb-4">
       <div className="card-body">
-        <h2 className="card-title">
+        <h1 className="card-title">
           {location.name}, {location.region}, {location.country}
-        </h2>
+        </h1>
         <p className="card-text">
           {formattedDate}, {dayOfWeek} {formattedTime}
         </p>
@@ -144,64 +144,100 @@ const CurrentWeather = React.memo(({ data }) => {
             className="me-3"
           />
           <div>
-            <h3 className="mb-0">
+            <h2 className="mb-0">
               {temp}
               {tempUnit}
-            </h3>
+            </h2>
             <p className="mb-0">{current.condition.text}</p>
           </div>
         </div>
         <div className="row">
           <div className="col-md-6">
-            <p className="card-text">
-              Feels Like: {feelsLike}
-              {tempUnit}
-            </p>
-            {/* Display wind chill only if it's available */}
-            {current.windchill_f !== undefined &&
-              current.windchill_c !== undefined && (
-                <p className="card-text">
-                  Wind Chill: {windChill}
-                  {tempUnit}
-                </p>
-              )}
-            {/* Display heat index only if it's available */}
-            {current.heatindex_f !== undefined &&
-              current.heatindex_c !== undefined && (
-                <p className="card-text">
-                  Heat Index: {heatIndex}
-                  {tempUnit}
-                </p>
-              )}
-            <p className="card-text">
-              Wind: {windSpeed} {windSpeedUnit} {current.wind_dir}
-            </p>
-            <p className="card-text">
-              Wind Gust: {windGust} {windSpeedUnit}
-            </p>
+            <dl>
+              <dt>
+                <h3>Feels Like</h3>
+              </dt>
+              <dd>
+                {feelsLike}
+                {tempUnit}
+              </dd>
+              {current.windchill_f !== undefined &&
+                current.windchill_c !== undefined && (
+                  <>
+                    <dt>
+                      <h3>Wind Chill</h3>
+                    </dt>
+                    <dd>
+                      {windChill}
+                      {tempUnit}
+                    </dd>
+                  </>
+                )}
+              {current.heatindex_f !== undefined &&
+                current.heatindex_c !== undefined && (
+                  <>
+                    <dt>
+                      <h3>Heat Index</h3>
+                    </dt>
+                    <dd>
+                      {heatIndex}
+                      {tempUnit}
+                    </dd>
+                  </>
+                )}
+              <dt>
+                <h3>Wind</h3>
+              </dt>
+              <dd>
+                {windSpeed} {windSpeedUnit} {current.wind_dir}
+              </dd>
+              <dt>
+                <h3>Wind Gust</h3>
+              </dt>
+              <dd>
+                {windGust} {windSpeedUnit}
+              </dd>
+            </dl>
           </div>
           <div className="col-md-6">
-            <p className="card-text">
-              Pressure: {pressure} {pressureUnit}
-            </p>
-            <p className="card-text">
-              Visibility: {visibility} {visibilityUnit}
-            </p>
-            <p className="card-text">Humidity: {current.humidity}%</p>
-            <p className="card-text">UV Index: {current.uv}</p>
-            {/* Display dew point only if it's available */}
-            {current.dewpoint_f !== undefined &&
-              current.dewpoint_c !== undefined && (
-                <p className="card-text">
-                  Dew Point: {dewPoint}
-                  {tempUnit}
-                </p>
-              )}
+            <dl>
+              <dt>
+                <h3>Pressure</h3>
+              </dt>
+              <dd>
+                {pressure} {pressureUnit}
+              </dd>
+              <dt>
+                <h3>Visibility</h3>
+              </dt>
+              <dd>
+                {visibility} {visibilityUnit}
+              </dd>
+              <dt>
+                <h3>Humidity</h3>
+              </dt>
+              <dd>{current.humidity}%</dd>
+              <dt>
+                <h3>UV Index</h3>
+              </dt>
+              <dd>{current.uv}</dd>
+              {current.dewpoint_f !== undefined &&
+                current.dewpoint_c !== undefined && (
+                  <>
+                    <dt>
+                      <h3>Dew Point</h3>
+                    </dt>
+                    <dd>
+                      {dewPoint}
+                      {tempUnit}
+                    </dd>
+                  </>
+                )}
+            </dl>
           </div>
         </div>
-        {/* Display alerts if there are any */}
         {alerts && alerts.alert && alerts.alert.length > 0 && (
-          <div className="mt-3">
+          <div className="mt-3" aria-live="polite" aria-atomic="true">
             <h4 className="text-danger">Weather Alerts:</h4>
             <ul>
               {alerts.alert.map((alert, index) => (

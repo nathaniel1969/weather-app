@@ -113,7 +113,13 @@ const HourlyTemperatureChart = ({
           <option value={48}>48</option>
         </select>
       </div>
-      <Line data={chartData} options={options} />
+      <div aria-describedby="chartDescription">
+        <p id="chartDescription" className="visually-hidden">
+          This chart shows the hourly temperature trend for the next{" "}
+          {hoursToShow} hours.
+        </p>
+        <Line data={chartData} options={options} />
+      </div>
     </div>
   );
 };

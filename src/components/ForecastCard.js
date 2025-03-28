@@ -117,45 +117,81 @@ const ForecastCard = React.memo(({ day }) => {
   return (
     <div className="card rounded-3 mb-3">
       <div className="card-body text-center">
-        <h5 className="card-title">{dayOfWeek}</h5>
+        <h3 className="card-title">{dayOfWeek}</h3>
         <p className="card-text">{formattedDate}</p>
         <img
           src={currentDay.day.condition.icon}
           alt={currentDay.day.condition.text}
           className="mb-2"
         />
-        <p className="card-text">
-          High: {maxTemp}
-          {tempUnit} / Low: {minTemp}
-          {tempUnit}
-        </p>
-        {currentDay.day.daily_chance_of_rain > 0 && (
-          <p className="card-text">
-            Rain: {currentDay.day.daily_chance_of_rain}%
-          </p>
-        )}
-        {currentDay.day.daily_chance_of_snow > 0 && (
-          <p className="card-text">
-            Snow: {currentDay.day.daily_chance_of_snow}%
-          </p>
-        )}
-        {totalPrecip > 0 && (
-          <p className="card-text">
-            Total Precipitation: {totalPrecip} {precipUnit}
-          </p>
-        )}
-        <p className="card-text">
-          Wind: {maxWind} {windSpeedUnit} {currentDay.day.wind_dir}
-        </p>
-        <p className="card-text">
-          Average Visibility: {avgVis} {visUnit}
-        </p>
-        <p className="card-text">
-          Average Humidity: {currentDay.day.avghumidity}%
-        </p>
-        <p className="card-text">UV Index: {currentDay.day.uv}</p>
-        <p className="card-text">Sunrise: {sunriseTime}</p>
-        <p className="card-text">Sunset: {sunsetTime}</p>
+        <dl>
+          <dt>
+            <h4>Temperature</h4>
+          </dt>
+          <dd className="card-text">
+            High: {maxTemp}
+            {tempUnit} / Low: {minTemp}
+            {tempUnit}
+          </dd>
+          {currentDay.day.daily_chance_of_rain > 0 && (
+            <>
+              <dt>
+                <h4>Rain</h4>
+              </dt>
+              <dd className="card-text">
+                {currentDay.day.daily_chance_of_rain}%
+              </dd>
+            </>
+          )}
+          {currentDay.day.daily_chance_of_snow > 0 && (
+            <>
+              <dt>
+                <h4>Snow</h4>
+              </dt>
+              <dd className="card-text">
+                {currentDay.day.daily_chance_of_snow}%
+              </dd>
+            </>
+          )}
+          {totalPrecip > 0 && (
+            <>
+              <dt>
+                <h4>Total Precipitation</h4>
+              </dt>
+              <dd className="card-text">
+                {totalPrecip} {precipUnit}
+              </dd>
+            </>
+          )}
+          <dt>
+            <h4>Wind</h4>
+          </dt>
+          <dd className="card-text">
+            {maxWind} {windSpeedUnit} {currentDay.day.wind_dir}
+          </dd>
+          <dt>
+            <h4>Average Visibility</h4>
+          </dt>
+          <dd className="card-text">
+            {avgVis} {visUnit}
+          </dd>
+          <dt>
+            <h4>Average Humidity</h4>
+          </dt>
+          <dd className="card-text">{currentDay.day.avghumidity}%</dd>
+          <dt>
+            <h4>UV Index</h4>
+          </dt>
+          <dd className="card-text">{currentDay.day.uv}</dd>
+          <dt>
+            <h4>Sunrise</h4>
+          </dt>
+          <dd className="card-text">{sunriseTime}</dd>
+          <dt>
+            <h4>Sunset</h4>
+          </dt>
+          <dd className="card-text">{sunsetTime}</dd>
+        </dl>
       </div>
     </div>
   );

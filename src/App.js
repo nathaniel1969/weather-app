@@ -65,8 +65,16 @@ function App() {
         <UnitToggle /> {/* Add the toggle here */}
       </div>
       <SearchBar onSearch={handleSearch} />
-      {isLoading && <div className="text-center">Loading...</div>}
-      {error && <div className="text-center text-danger">{error}</div>}
+      {isLoading && (
+        <div className="text-center" aria-live="polite">
+          Loading...
+        </div>
+      )}
+      {error && (
+        <div className="text-center text-danger" aria-live="polite">
+          {error}
+        </div>
+      )}
       {!isLoading && weatherData && <CurrentWeather data={weatherData} />}
       {!isLoading && weatherData && (
         <DailyForecast forecast={weatherData.forecast} data={weatherData} />

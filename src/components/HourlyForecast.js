@@ -31,25 +31,41 @@ function HourlyForecast({ adjustedForecast, hoursToShow, setHoursToShow }) {
           <div key={hour.time_epoch} className="col">
             <div className="card h-100 text-center">
               <div className="card-body">
-                <h5 className="card-title">{hour.adjustedTime}</h5>
+                <h4 className="card-title">{hour.adjustedTime}</h4>
                 <img
                   src={hour.condition.icon}
                   alt={hour.condition.text}
                   className="weather-icon mb-2"
                 />
-                <p className="card-text">
-                  {unit === "imperial" ? hour.temp_f : hour.temp_c}
-                  {tempUnit}
-                </p>
-                <p className="card-text">{hour.condition.text}</p>
-                <p className="card-text">
-                  Pressure:{" "}
-                  {unit === "imperial"
-                    ? hour.pressure_in + " inHg"
-                    : hour.pressure_mb + " mb"}
-                </p>
-                <p className="card-text">UV Index: {hour.uv}</p>
-                <p className="card-text">Humidity: {hour.humidity}%</p>
+                <dl>
+                  <dt>
+                    <h5>Temperature</h5>
+                  </dt>
+                  <dd className="card-text">
+                    {unit === "imperial" ? hour.temp_f : hour.temp_c}
+                    {tempUnit}
+                  </dd>
+                  <dt>
+                    <h5>Condition</h5>
+                  </dt>
+                  <dd className="card-text">{hour.condition.text}</dd>
+                  <dt>
+                    <h5>Pressure</h5>
+                  </dt>
+                  <dd className="card-text">
+                    {unit === "imperial"
+                      ? hour.pressure_in + " inHg"
+                      : hour.pressure_mb + " mb"}
+                  </dd>
+                  <dt>
+                    <h5>UV Index</h5>
+                  </dt>
+                  <dd className="card-text">{hour.uv}</dd>
+                  <dt>
+                    <h5>Humidity</h5>
+                  </dt>
+                  <dd className="card-text">{hour.humidity}%</dd>
+                </dl>
               </div>
             </div>
           </div>
