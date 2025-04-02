@@ -60,7 +60,7 @@ const HourlyTemperatureChart = ({
     responsive: true,
     plugins: {
       legend: {
-        position: "top",
+        display: false, // This line removes the legend
       },
       title: {
         display: true,

@@ -3,17 +3,17 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import SearchBar from "./components/SearchBar";
 import CurrentWeather from "./components/CurrentWeather";
 import DailyForecast from "./components/DailyForecast";
-import { getWeatherData, getLocationFromCoordinates } from "./api"; // Import the new function
+import { getWeatherData, getLocationFromCoordinates } from "./api";
 import "./App.css";
-import UnitToggle from "./components/UnitToggle"; // Import the toggle
-import HourlyTemperatureChart from "./components/HourlyTemperatureChart"; // Import the new component
+import UnitToggle from "./components/UnitToggle";
+import HourlyTemperatureChart from "./components/HourlyTemperatureChart";
 import HourlyForecast from "./components/HourlyForecast";
 import { processHourlyForecast } from "./utils";
-import Favorites from "./components/Favorites"; // Import the new component
+import Favorites from "./components/Favorites";
 
 function App() {
   const [weatherData, setWeatherData] = useState(null);
-  const [location, setLocation] = useState(null); // Changed to null initially
+  const [location, setLocation] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hoursToShow, setHoursToShow] = useState(12);
@@ -69,16 +69,17 @@ function App() {
             if (locationFromCoords) {
               setLocation(locationFromCoords);
             } else {
-              setLocation("New York"); // Default location if reverse geocoding fails
+              setLocation("New York");
             }
           },
           (error) => {
             console.error("Error getting location:", error);
-            setLocation("New York"); // Default location on error
-          }
+            setLocation("New York");
+          },
+          { timeout: 10000 } // Added timeout option
         );
       } else {
-        setLocation("New York"); // Default location if geolocation is not supported
+        setLocation("New York");
       }
     };
     fetchLocation();
@@ -122,7 +123,7 @@ function App() {
     <div className="container mt-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1 className="text-center">Weather App</h1>
-        <UnitToggle /> {/* Add the toggle here */}
+        <UnitToggle />
       </div>
       <SearchBar onSearch={handleSearch} />
       {weatherData && (
