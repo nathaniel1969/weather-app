@@ -21,7 +21,7 @@ export const formatTime = (timeString, date) => {
   });
 };
 
-export const adjustHourData = (hourData, localDate) => {
+const adjustHourData = (hourData) => {
   // Extract year, month, day, hours, and minutes from hourData.time
   const [hourDatePart, hourTimePart] = hourData.time.split(" ");
   const [hourYear, hourMonth, hourDay] = hourDatePart.split("-").map(Number);
@@ -54,7 +54,7 @@ export const processHourlyForecast = (forecast, localDate, hoursToShow) => {
 
   currentHour = (currentHour + 1) % 24;
   let adjustedForecast = forecast.forecastday[0].hour
-    .map((hour) => adjustHourData(hour, localDate))
+    .map((hour) => adjustHourData(hour))
     .filter((hour) => {
       return (
         hour.adjustedDay === currentDay && hour.adjustedHour >= currentHour
@@ -66,7 +66,7 @@ export const processHourlyForecast = (forecast, localDate, hoursToShow) => {
     forecast.forecastday.length > 1
   ) {
     const nextDayForecast = forecast.forecastday[1].hour
-      .map((hour) => adjustHourData(hour, localDate))
+      .map((hour) => adjustHourData(hour))
       .filter((hour) => hour.adjustedDay !== currentDay)
       .slice(0, hoursToShow - adjustedForecast.length);
     adjustedForecast.push(...nextDayForecast);
